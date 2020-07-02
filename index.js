@@ -26,6 +26,15 @@ let persons = [
   }
 ]
 
+const findByName = (name) => {
+  return persons.find(person => person.name === name)
+}
+
+const generateRandomId = () => {
+  const max = 483647
+  const min = 1
+  return Math.floor(Math.random() * (max - min)) + min;
+}
 const generateId = () => {
   const maxId = persons.length > 0
     ? Math.max(...persons.map(n => n.id))
@@ -35,6 +44,34 @@ const generateId = () => {
 
 app.get('/api/persons', (req, res) => {
   res.json(persons)
+})
+
+app.post('/api/persons', (req, res) => {
+  let {name, number} = req.body
+  name = name.trim()
+  number = number.trim()
+
+  if(!name) {
+    return res.status(400).json({ error: 'name must be require' })
+  }
+  if(!number) {
+    return res.status(400).json({ error: 'number must be require' })
+  }
+
+  const existPerson = findByName(name)
+  if(existPerson) {
+    return res.status(400).json({ error: 'name must be unique' })
+  }
+
+  // allow to create
+  const newPerson = {
+    name,
+    number,
+    id: generateRandomId()
+  }
+  persons = [...persons, newPerson]
+
+  return res.json(newPerson)
 })
 
 app.get('/api/persons/:id', (req, res) => {
