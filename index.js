@@ -4,9 +4,13 @@ const app = express()
 
 app.use(express.json())
 
-// middlewares
-app.use(morgan('tiny'))
 
+// middlewares
+
+morgan.token('res-body', function (req, res) { return JSON.stringify(req.body) })
+
+const morganStyle = morgan(':method :url :status :res[content-length] - :response-time ms :res-body')
+app.use(morganStyle)
 
 let persons = [
   {
@@ -39,12 +43,6 @@ const generateRandomId = () => {
   const max = 483647
   const min = 1
   return Math.floor(Math.random() * (max - min)) + min;
-}
-const generateId = () => {
-  const maxId = persons.length > 0
-    ? Math.max(...persons.map(n => n.id))
-    : 0
-  return maxId + 1
 }
 
 app.get('/api/persons', (req, res) => {
