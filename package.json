@@ -16,7 +16,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "build:ui": "rm -rf build && cd ../fullstack-open-excercise/part2/phonebook && npm run build && cp -r build ../../../fullstack-open-exercise-be",
-    "deploy": "git push heroku master",
+    "deploy": "git push heroku master --force",
     "deploy:full": "npm run build:ui && npm run deploy",
     "logs:prod": "heroku logs --tail"
   },
