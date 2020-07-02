@@ -11,6 +11,8 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
     console.log('error connecting to MongoDB:', error.message)
   })
 
+mongoose.set('useFindAndModify', false)
+
 const personSchema = new mongoose.Schema({
   name: String,
   number: String

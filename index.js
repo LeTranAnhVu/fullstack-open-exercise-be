@@ -28,23 +28,31 @@ app.get('/api/persons', async (req, res) => {
   try {
     const people = await Person.find()
     return res.json(people)
-  }catch (e) {
+  } catch (e) {
     console.log(e)
     res.status(500).end()
   }
 })
 
-app.post('/api/persons', async(req, res) => {
+const verifyPersonData = (req, res, next) => {
   let {name, number} = req.body
   name = name.trim()
   number = number.trim()
+  if (!name || !number) {
+    if (!name) {
+      return res.status(400).json({error: 'name must be require'})
+    }
+    if (!number) {
+      return res.status(400).json({error: 'number must be require'})
+    }
+  } else {
+    req.body = {...req.body, name, number}
+    next()
+  }
+}
 
-  if (!name) {
-    return res.status(400).json({error: 'name must be require'})
-  }
-  if (!number) {
-    return res.status(400).json({error: 'number must be require'})
-  }
+app.post('/api/persons', verifyPersonData, async (req, res) => {
+
 
   // if (existPerson) {
   //   return res.status(400).json({error: 'name must be unique'})
@@ -59,25 +67,40 @@ app.post('/api/persons', async(req, res) => {
   return res.json(newPerson)
 })
 
-app.get('/api/persons/:id', (req, res) => {
-  const id = parseInt(req.params.id)
-  const person = persons.find(person => {
-    return person.id === id
-  })
-  if (person) {
-    res.json(person)
-  } else {
-    res.status(404).json({message: 'Not found!'})
+app.get('/api/persons/:id', async (req, res, next) => {
+  try {
+    const id = req.params.id
+    const person = await Person.findById(id)
+    if (person) {
+      res.json(person)
+    } else {
+      res.status(404).json({message: 'Not found!'})
+    }
+  } catch (e) {
+    next(e)
   }
 })
 
-app.delete('/api/persons/:id', (req, res) => {
-  const id = parseInt(req.params.id)
+app.put('/api/persons/:id', verifyPersonData, async (req, res, next) => {
+  try {
+    const id = req.params.id
+    const {name, number} = req.body
+    const person = {name, number}
+    await Person.findByIdAndUpdate(id, person, {new: true})
+    res.json(person)
+  } catch (e) {
+    next(e)
+  }
+})
 
-  persons = persons.filter(person => {
-    return person.id !== id
-  })
-  res.status(204).end()
+app.delete('/api/persons/:id', async (req, res, next) => {
+  try {
+    const id = req.params.id
+    await Person.findByIdAndDelete(id)
+    res.status(204).end()
+  } catch (e) {
+    next(e)
+  }
 })
 
 
@@ -85,6 +108,15 @@ app.get('/info', (req, res) => {
   res.send(`<p>Phonebook has info for ${persons.length} people</p><p>${new Date()}</p>`)
 })
 
+
+const errorHandler = (err, req, res, next) => {
+  console.log(err)
+  if (err.name === 'CastError' && error.kind == 'ObjectId') {
+    return res.status(400).send({error: 'malformatted id'})
+  }
+  next(err)
+}
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 
