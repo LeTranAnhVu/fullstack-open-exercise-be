@@ -12,7 +12,10 @@
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "deploy": "git push heroku master",
+    "deploy:full": "git add . && git commit -m deploy && npm run deploy",
+    "logs:prod": "heroku logs --tail"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"

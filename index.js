@@ -13,6 +13,10 @@ morgan.token('res-body', function (req, res) { return JSON.stringify(req.body) }
 const morganStyle = morgan(':method :url :status :res[content-length] - :response-time ms :res-body')
 app.use(morganStyle)
 
+// static
+app.use(express.static('build'))
+
+// apis
 let persons = [
   {
     'name': 'Arto Hellas',
