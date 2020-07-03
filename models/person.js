@@ -12,9 +12,14 @@ mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true})
   })
 
 mongoose.set('useFindAndModify', false)
+mongoose.set('useCreateIndex', true);
 
 const personSchema = new mongoose.Schema({
-  name: String,
+  name: {
+    type: String,
+    unique: true,
+    required: true
+  },
   number: String
 })
 

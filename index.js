@@ -51,19 +51,20 @@ const verifyPersonData = (req, res, next) => {
   }
 }
 
-app.post('/api/persons', verifyPersonData, async (req, res) => {
-  const{name, number} = req.body
-  // if (existPerson) {
-  //   return res.status(400).json({error: 'name must be unique'})
-  // }
+app.post('/api/persons', verifyPersonData, async (req, res, next) => {
+  try {
+    const {name, number} = req.body
+    // allow to create
+    const newPerson = new Person({
+      name,
+      number,
+    })
+    await newPerson.save()
+    return res.json(newPerson)
+  } catch (e) {
+    next(e)
+  }
 
-  // allow to create
-  const newPerson = new Person({
-    name,
-    number,
-  })
-  await newPerson.save()
-  return res.json(newPerson)
 })
 
 app.get('/api/persons/:id', async (req, res, next) => {
@@ -110,8 +111,13 @@ app.get('/info', (req, res) => {
 
 const errorHandler = (err, req, res, next) => {
   console.log(err)
-  if (err.name === 'CastError' && error.kind == 'ObjectId') {
+  if (err.name === 'CastError' && err.kind == 'ObjectId') {
     return res.status(400).send({error: 'malformatted id'})
+  } else if (err.name === 'ValidationError') {
+    return res.status(400).send({error: err.message})
+  }else if(err.name === 'MongoError' && err.code=== 11000) {
+    const keys = Object.keys(err.keyPattern)
+    return res.status(400).send({error: `${keys.join(',')} is existed`})
   }
   next(err)
 }
