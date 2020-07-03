@@ -86,7 +86,7 @@ app.put('/api/persons/:id', verifyPersonData, async (req, res, next) => {
     const id = req.params.id
     const {name, number} = req.body
     const person = {name, number}
-    await Person.findByIdAndUpdate(id, person, {new: true})
+    await Person.findByIdAndUpdate(id, person, {new: true, runValidators: true})
     res.json(person)
   } catch (e) {
     next(e)
@@ -103,11 +103,9 @@ app.delete('/api/persons/:id', async (req, res, next) => {
   }
 })
 
-
 app.get('/info', (req, res) => {
   res.send(`<p>Phonebook has info for ${persons.length} people</p><p>${new Date()}</p>`)
 })
-
 
 const errorHandler = (err, req, res, next) => {
   console.log(err)
@@ -115,7 +113,7 @@ const errorHandler = (err, req, res, next) => {
     return res.status(400).send({error: 'malformatted id'})
   } else if (err.name === 'ValidationError') {
     return res.status(400).send({error: err.message})
-  }else if(err.name === 'MongoError' && err.code=== 11000) {
+  } else if (err.name === 'MongoError' && err.code === 11000) {
     const keys = Object.keys(err.keyPattern)
     return res.status(400).send({error: `${keys.join(',')} is existed`})
   }
