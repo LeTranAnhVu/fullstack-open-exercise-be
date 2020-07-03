@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 const url = process.env.MONGODB_URI
 
 mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true})
-  .then(result => {
+  .then(() => {
     console.log('connected to MongoDB')
   })
   .catch((error) => {
@@ -12,7 +12,7 @@ mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true})
   })
 
 mongoose.set('useFindAndModify', false)
-mongoose.set('useCreateIndex', true);
+mongoose.set('useCreateIndex', true)
 
 const personSchema = new mongoose.Schema({
   name: {
@@ -26,11 +26,11 @@ const personSchema = new mongoose.Schema({
     validate: {
       validator: (v) => {
         const isCorrect = /^\d[\d-]+\d$/.test(v)
-        if(isCorrect) {
-          let collectNumbers = v.split("").filter(c => !isNaN(Number(c)))
+        if (isCorrect) {
+          let collectNumbers = v.split('').filter(c => !isNaN(Number(c)))
           // require number have to have 8 digits
           return collectNumbers.length >= 8
-        }else {
+        } else {
           return isCorrect
         }
       },

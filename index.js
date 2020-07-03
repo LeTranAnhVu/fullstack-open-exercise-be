@@ -1,6 +1,5 @@
 require('dotenv').config()
 const express = require('express')
-const mongoose = require('mongoose')
 const cors = require('cors')
 const morgan = require('morgan')
 const app = express()
@@ -13,7 +12,7 @@ app.use(express.json())
 const Person = require('./models/person')
 
 // middlewares
-morgan.token('res-body', function (req, res) {
+morgan.token('res-body', function (req/*,res*/) {
   return JSON.stringify(req.body)
 })
 
@@ -102,10 +101,10 @@ app.delete('/api/persons/:id', async (req, res, next) => {
     next(e)
   }
 })
-
-app.get('/info', (req, res) => {
-  res.send(`<p>Phonebook has info for ${persons.length} people</p><p>${new Date()}</p>`)
-})
+//
+// app.get('/info', (req, res) => {
+//   res.send(`<p>Phonebook has info for ${Person.find.length} people</p><p>${new Date()}</p>`)
+// })
 
 const errorHandler = (err, req, res, next) => {
   console.log(err)
