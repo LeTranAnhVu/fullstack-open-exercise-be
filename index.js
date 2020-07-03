@@ -52,8 +52,7 @@ const verifyPersonData = (req, res, next) => {
 }
 
 app.post('/api/persons', verifyPersonData, async (req, res) => {
-
-
+  const{name, number} = req.body
   // if (existPerson) {
   //   return res.status(400).json({error: 'name must be unique'})
   // }
